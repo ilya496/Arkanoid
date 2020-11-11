@@ -1,5 +1,6 @@
-import pygame as pg
+import pygame as pg, os
 
+os.environ['SDL_VIDEODRIVER'] = 'directx'
 pg.init()
 screenx = 1000
 screeny = 1000
@@ -11,27 +12,26 @@ p = pg.Rect(500, 700, 300, 50)
 r = pg.Rect(screenx/2, screeny/2, 40, 40)
 clock = pg.time.Clock()
 l = []
-t = r.colliderect(p)
+text = pg.font.match_font('Arial')
+f = pg.font.Font(text, 28)
 print('Choose your game mode. Easy, Medium, Hard')
-game_mode = input()
+game_mode = 'Easy'#input()
 screen = pg.display.set_mode([screenx, screeny])
 
 if game_mode == 'Easy':
-    speedx = 9
-    speedy = 9
+    speedx = 6
+    speedy = 6
     step = 14
-    for i in range(int(screenx / 50)):
+    for i in range(screenx//50):
         l.append(pg.Rect(i * 50, 100, 49, 50))
-    game_mode = ''
 
 if game_mode == 'Medium':
     speedx = 11
     speedy = 11
     step = 17
-    game_mode = ''
-    for i in range(int(screenx / 50)):
+    for i in range(screenx//50):
         l.append(pg.Rect(i * 50, 100, 49, 50))
-    for i in range(int(screenx / 50)):
+    for i in range(screenx//50):
         l.append(pg.Rect(i * 50, 151, 49, 50))
 
 if game_mode == 'Hard':
@@ -42,15 +42,13 @@ if game_mode == 'Hard':
         l.append(pg.Rect(i * 50, 100, 49, 50))
     for i in range(int(screenx / 50)):
         l.append(pg.Rect(i * 50, 151, 49, 50))
-    game_mode = ''
 pg.key.set_repeat(50)
 while True:
-    clock.tick(60)
+    clock.tick(100)
     b = pg.event.get()
 
     # Отражении от верхних блоков
     t1 = r.collidelist(l)
-    print(speedy, speedx)
     if t1 != -1:
         SCORE += 1
         print(SCORE)
@@ -81,9 +79,9 @@ while True:
     if len(l) == 0:
         print('You win!')
         break
-    if r.bottom >= screeny:
-        print('You lose!')
-        break
+    # if r.bottom >= screeny:
+    #     print('You lose!')
+    #     break
 
     # Управление платформой
     t = r.colliderect(p)
@@ -91,23 +89,26 @@ while True:
     for i in b:
         if i.type == pg.QUIT:
             exit()
-        if i.type == pg.KEYDOWN and i.key == pg.K_RIGHT:
-            p.right += step
-            t = r.colliderect(p)
-            if t == 1:
-                r.left = p.right
-
-        if i.type == pg.KEYDOWN and i.key == pg.K_LEFT:
-            p.left -= step
-            t = r.colliderect(p)
-            if t == 1:
-                r.right = p.left
-
-        if i.type == pg.KEYDOWN and i.key == pg.K_UP:
-            p.bottom -= step
-            t = r.colliderect(p)
-            if t == 1:
-                r.bottom = p.top
+        # if i.type == pg.KEYDOWN and i.key == pg.K_RIGHT:
+        #     p.right += step
+        #     t = r.colliderect(p)
+        #     if t == 1:
+        #         r.left = p.right
+        #
+        # if i.type == pg.KEYDOWN and i.key == pg.K_LEFT:
+        #     p.left -= step
+        #     t = r.colliderect(p)
+        #     if t == 1:
+        #         r.right = p.left
+        #
+        # if i.type == pg.KEYDOWN and i.key == pg.K_UP:
+        #     p.bottom -= step
+        #     t = r.colliderect(p)
+        #     if t == 1:
+        #         r.bottom = p.top
+        if i.type == pg.MOUSEMOTION:
+            print(i)
+            p.centerx = i.pos[0]
 
         if i.type == pg.KEYDOWN and i.key == pg.K_DOWN:
             p.top += step
@@ -168,4 +169,8 @@ while True:
         pg.draw.rect(screen, [201, 0, 17], j, 0)
     pg.draw.circle(screen, [255, 221, 0], r.center, 20)
     pg.draw.rect(screen, [0, 195, 4], p)
+    f1 = f.render('score: '+str(SCORE), True, [255,255,255])
+    fps = f.render('FPS: '+str(clock.get_fps()), True, [255,255,255])
+    screen.blit(f1, [100,100])
+    screen.blit(fps, [850,100])
     pg.display.flip()
