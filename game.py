@@ -9,7 +9,10 @@ p = pg.Rect(500, 700, 300, 50)
 score = 0
 text = pg.font.match_font('Arial')
 f = pg.font.Font(text, 28)
-game_mode = input()
+
+#TODO выбор сложности должен делаться в меню. А не в игре.
+# Игра должна сразу запускаться с какой-то сложностью.
+game_mode = input() #TODO сделать вопрос пользователю, на какой вопрос он отвечает?
 
 if game_mode == 'Easy':
     speedx = 6
@@ -103,8 +106,12 @@ def game(screen):
         if i.type == pg.MOUSEMOTION:
             print(i)
             p.centerx = i.pos[0]
+            #FIXME здесь также должна быть проверка на движение платформы
+            # попробуй остановить шарик и подвигать платформой. Она должна толкать шарик.
+            # мы с одним учеником делали немного по-другому наезд платформы на шарик:
+            # просто не давали платформе наезжать на шарик. Работает ничуть не хуже.
 
-        if i.type == pg.KEYDOWN and i.key == pg.K_DOWN:
+        if i.type == pg.KEYDOWN and i.key == pg.K_DOWN: #FIXME это действительно здесь нужно?
             p.top += step
             t = r.colliderect(p)
             if t == 1:
