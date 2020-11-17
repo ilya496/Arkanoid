@@ -167,6 +167,14 @@ def game(screen):
         if r.centery < p.top:
             r.bottom = p.top
             speedy = -speedy
+            #FIXME есть вопросы по этому алгоритму
+            # ты анализируешь, где оказалась нижняя граница прямоугольника относительно платформы.
+            # а не легче ли анализировать, где оказался центр круга/прямоугольника относительно платформы?
+            # тогда не придется сравнивать два числа (начало и конец нижней границы)
+
+            #FIXME расчет скоростей тоже вызывает вопросы.
+            # общая скорость не должна меняться. Т.е. по теореме пифагора
+            # корень из (speedx*speedx+speedy*speedy) должен быть одинаковым при любых speedx и speedy
             clipped_line = p.clipline(r.bottomleft, r.bottomright)
             start, end = clipped_line
             x1, y1 = start
@@ -176,7 +184,7 @@ def game(screen):
                     speedy = 0.5*speedx
                 if x1 >= p.left + p.w/3 and x2 <= p.left + p.w*2/3:
                     speedy = speedx
-                    speedy = -speedy
+                    speedy = -speedy #FIXME скорость вроде уже меняли на 169 строке?
                 if x1 >= p.left + p.w*2/3 and x2 <= p.right:
                     speedy /= -2
                     speedy = 0.5 * speedx
