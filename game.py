@@ -1,41 +1,43 @@
 import pygame as pg, settings
+
 clock = pg.time.Clock()
-r = pg.Rect(settings.SCREENX/2, settings.SCREENY/2, 40, 40)
+r = pg.Rect(settings.SCREENX / 2, settings.SCREENY / 2, 30, 30)
 l = []
 step = 20
 speedx = 0
 speedy = 0
-p = pg.Rect(500, 700, 300, 50)
+p = pg.Rect(0, 700, 300, 50)
 score = 0
 pg.key.set_repeat(50)
 picture = pg.image.load('pictures/background.png')
 text = pg.font.match_font('Arial')
 f = pg.font.Font(text, 24)
 
+
 def restart(game_mode):
     global speedx, speedy, step, score
 
-    r.centerx = settings.SCREENX/2
-    r.centery = settings.SCREENY/2
+    r.centerx = settings.SCREENX / 2
+    r.centery = settings.SCREENY / 2
     l.clear()
     score = 0
-    p.centerx = 500
+    p.centerx = 600
     p.centery = 700
 
     if game_mode == 'Easy':
-        speedx = 0
-        speedy = 0
+        speedx = 9
+        speedy = 9
         step = 14
-        for i in range(settings.SCREENX//50):
+        for i in range(settings.SCREENX // 50):
             l.append(pg.Rect(i * 50, 100, 49, 50))
 
     if game_mode == 'Medium':
         speedx = 11
         speedy = 11
         step = 17
-        for i in range(settings.SCREENX//50):
+        for i in range(settings.SCREENX // 50):
             l.append(pg.Rect(i * 50, 100, 49, 50))
-        for i in range(settings.SCREENX//50):
+        for i in range(settings.SCREENX // 50):
             l.append(pg.Rect(i * 50, 151, 49, 50))
 
     if game_mode == 'Hard':
@@ -47,6 +49,7 @@ def restart(game_mode):
         for i in range(int(settings.SCREENX / 50)):
             l.append(pg.Rect(i * 50, 151, 49, 50))
 
+
 def game(screen):
     global score, speedy, speedx
     clock.tick(100)
@@ -56,7 +59,7 @@ def game(screen):
     t1 = r.collidelist(l)
     if t1 != -1:
         score += 1
-        print(score)
+        # print(score)
         if r.centery < l[t1].top:
             r.bottom = l[t1].top
             speedy = -speedy
@@ -112,10 +115,10 @@ def game(screen):
         #     if t == 1:
         #         r.bottom = p.top
         if i.type == pg.MOUSEMOTION:
-            print(i)
+            # print(i)
             p.centerx = i.pos[0]
             p.centery = i.pos[1]
-            #FIXME здесь также должна быть проверка на движение платформы
+            # FIXME здесь также должна быть проверка на движение платформы
             # попробуй остановить шарик и подвигать платформой. Она должна толкать шарик.
             # мы с одним учеником делали немного по-другому наезд платформы на шарик:
             # просто не давали платформе наезжать на шарик. Работает ничуть не хуже.
@@ -126,7 +129,7 @@ def game(screen):
         #     if t == 1:
         #         r.top = p.bottom
 
-    # Движение прямоугльника
+    # Движение шарика
     r.right += speedx
 
     if r.right >= settings.SCREENX:
@@ -164,12 +167,23 @@ def game(screen):
         if r.centery < p.top:
             r.bottom = p.top
             speedy = -speedy
-            t = r.colliderect(p)
+            clipped_line = p.clipline(r.bottomleft, r.bottomright)
+            start, end = clipped_line
+            x1, y1 = start
+            x2, y2 = end
+            if clipped_line:
+                if x1 >= p.left and x2 <= p.left + p.w/3:
+                    speedy = 0.5*speedx
+                if x1 >= p.left + p.w/3 and x2 <= p.left + p.w*2/3:
+                    speedy = speedx
+                    speedy = -speedy
+                if x1 >= p.left + p.w*2/3 and x2 <= p.right:
+                    speedy /= -2
+                    speedy = 0.5 * speedx
 
         elif r.centery > p.bottom:
             r.top = p.bottom
             speedy = -speedy
-            t = r.colliderect(p)
 
     # Рисуем кадры
     screen.fill([0, 0, 0])
@@ -178,8 +192,8 @@ def game(screen):
     pg.draw.circle(screen, [255, 221, 0], r.center, 20)
     pg.draw.rect(screen, [0, 195, 4], p)
     screen.blit(picture, p.topleft, p)
-    f1 = f.render('score: ' + str(score), True, [255, 255, 255])
+    f1 = f.render('SCORE: ' + str(score), True, [255, 255, 255])
     fps = f.render('FPS: ' + str(round(clock.get_fps())), True, [255, 255, 255])
-    screen.blit(f1, [100, 100])
+    screen.blit(f1, [25, 25])
     screen.blit(fps, [875, 35])
     pg.display.flip()

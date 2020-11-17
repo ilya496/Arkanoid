@@ -8,7 +8,6 @@ game_mode = 'Easy'
 
 def menu(screen):
     clock.tick(100)
-    pg.event.get()
     screen_mode = ''
     # Конутр кнопок
     rmode1 = pg.Rect(430, 387, 200, 50)
