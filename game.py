@@ -207,6 +207,5 @@ def game(screen):
     f1 = f.render('SCORE: ' + str(score), True, [255, 255, 255])
     fps = f.render('FPS: ' + str(round(clock.get_fps())), True, [255, 255, 255])
     screen.blit(f1, [25, 25])
-    screen.blit()
     screen.blit(fps, [875, 35])
     pg.display.flip()
