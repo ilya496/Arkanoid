@@ -9,7 +9,7 @@ game_mode = 'Easy'
 def menu(screen):
     clock.tick(100)
     screen_mode = ''
-    # Конутр кнопок
+    # Контур кнопок
     rmode1 = pg.Rect(430, 387, 200, 50)
     rmode2 = pg.Rect(430, 487, 200, 50)
     rmode3 = pg.Rect(430, 587, 200, 50)
