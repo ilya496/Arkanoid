@@ -9,24 +9,25 @@ speedy = 0
 p = pg.Rect(0, 700, 300, 50)
 score = 0
 pg.key.set_repeat(50)
-picture = pg.image.load('pictures/background.png')
 text = pg.font.match_font('Arial')
 f = pg.font.Font(text, 24)
 speed = 10
 
-def ballhit(width,point):
-    percent = point/width*2
+
+def ballhit(width, point):
+    percent = point / width * 2
     percent = min(1, percent)
-    angle =  90 - percent * 80
+    angle = 90 - percent * 80
     print(angle)
     return angle
+
 
 def angle(speedx, speedy, angle):
     speed = math.sqrt(speedx ** 2 + speedy ** 2)
     speedx = math.cos(math.radians(angle)) * speed
-    speedy = math.sqrt(speed ** 2-speedx ** 2)
-
+    speedy = math.sqrt(speed ** 2 - speedx ** 2)
     return round(speedx), round(speedy)
+
 
 def restart(game_mode):
     global speedx, speedy, score, speed
@@ -39,7 +40,7 @@ def restart(game_mode):
     p.centery = 700
 
     if game_mode == 'Easy':
-        speedx, speedy = angle(0, 5, 90)
+        speedx, speedy = angle(0, 10, 90)
         for i in range(settings.SCREENX // 50):
             l.append(pg.Rect(i * 50, 100, 49, 50))
 
@@ -55,7 +56,18 @@ def restart(game_mode):
         speedy = 10
         for j in range(5):
             for i in range(int(settings.SCREENX / 50)):
-                l.append(pg.Rect(i * 50, 100+j*51, 49, 50))
+                l.append(pg.Rect(i * 50, 100 + j * 51, 49, 50))
+
+def start_position(rect, circle):
+    pressed = pg.mouse.get_pressed()
+    if pressed[2]:
+        click = 3
+    else:
+        circle.centerx = rect.centerx
+        circle.bottom = rect.top
+        click = 0
+    return click
+
 
 def game(screen):
     global score, speedy, speedx
@@ -66,7 +78,6 @@ def game(screen):
     t1 = r.collidelist(l)
     if t1 != -1:
         score += 1
-        # print(score)
         if r.centery < l[t1].top:
             r.bottom = l[t1].top
             speedy = -speedy
@@ -99,41 +110,21 @@ def game(screen):
         return 'menu'
 
     # Управление платформой
-    t = r.colliderect(p)
-
+    a = 0
     for i in b:
         if i.type == pg.QUIT:
             exit()
-        # if i.type == pg.KEYDOWN and i.key == pg.K_RIGHT:
-        #     p.right += step
-        #     t = r.colliderect(p)
-        #     if t == 1:
-        #         r.left = p.right
-        #
-        # if i.type == pg.KEYDOWN and i.key == pg.K_LEFT:
-        #     p.left -= step
-        #     t = r.colliderect(p)
-        #     if t == 1:
-        #         r.right = p.left
-        #
-        # if i.type == pg.KEYDOWN and i.key == pg.K_UP:
-        #     p.bottom -= step
-        #     t = r.colliderect(p)
-        #     if t == 1:
-        #         r.bottom = p.top
         if i.type == pg.MOUSEMOTION:
-            # print(i)
             p.centerx = i.pos[0]
-            # FIXME здесь также должна быть проверка на движение платформы
-            # попробуй остановить шарик и подвигать платформой. Она должна толкать шарик.
-            # мы с одним учеником делали немного по-другому наезд платформы на шарик:
-            # просто не давали платформе наезжать на шарик. Работает ничуть не хуже.
-
-        # if i.type == pg.KEYDOWN and i.key == pg.K_DOWN:
-        #     p.top += step
-        #     t = r.colliderect(p)
-        #     if t == 1:
-        #         r.top = p.bottom
+        if i.type == pg.KEYDOWN and i.key == pg.K_ESCAPE:
+            print(1)
+            pause = f.render('Game is paused', True, [255, 255, 255])
+            screen.blit(pause, [380, 200])
+            a += 1
+            return 'menu'
+        if a == 2:
+            a = 0
+            return 'game'
 
     # Движение шарика
     r.right += speedx
@@ -172,25 +163,12 @@ def game(screen):
     if t == 1:
         if r.centery < p.top:
             r.bottom = p.top
-            sx, sy = angle(speedx,speedy,ballhit(p.width, abs(p.centerx-r.centerx)))
+            sx, sy = angle(speedx, speedy, ballhit(p.width, abs(p.centerx - r.centerx)))
             speedy = -sy
-            if p.centerx-r.centerx < 0:
+            if p.centerx - r.centerx < 0:
                 speedx = sx
             else:
                 speedx = -sx
-
-            # if r.centerx >= p.left and r.centerx <= p.left + p.w / 3:
-            #     speedy = 0
-            #     speedx = 0
-            #     print("1/3 треть")
-            # elif r.centerx >= p.left + p.w / 3 and r.centerx <= p.left + p.w * 2 / 3:
-            #     speedy = 0
-            #     speedx = 0
-            #     print("2/3 треть")
-            # elif r.centerx >= p.left + p.w * 2 / 3 and r.centerx <= p.right:
-            #     speedy = 0
-            #     speedx = 0
-            #     print("3/3 треть")
 
         elif r.centery > p.bottom:
             r.top = p.bottom
@@ -202,8 +180,6 @@ def game(screen):
         pg.draw.rect(screen, [201, 0, 17], j, 0)
     pg.draw.circle(screen, [255, 221, 0], r.center, 20)
     pg.draw.rect(screen, [0, 195, 4], p)
-    pg.draw.rect(screen, [0, 195, 4], r)
-    screen.blit(picture, p.topleft, p)
     f1 = f.render('SCORE: ' + str(score), True, [255, 255, 255])
     fps = f.render('FPS: ' + str(round(clock.get_fps())), True, [255, 255, 255])
     screen.blit(f1, [25, 25])
