@@ -32,9 +32,9 @@ def restart(game_mode):
                 blocks.append(pg.Rect(i * 50, 100 + j * 51, 49, 50))
 
     if game_mode == 'Hard':
-        speedx = 10
-        speedy = 10
-        for j in range(5):
+        speedx = 14
+        speedy = 14
+        for j in range(3):
             for i in range(int(settings.SCREENX / 50)):
                 blocks.append(pg.Rect(i * 50, 100 + j * 51, 49, 50))
 
