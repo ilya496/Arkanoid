@@ -12,12 +12,12 @@ def game(screen):
     clock.tick(100)
     j = game_controller.process_events()
 
-    if j == 'pause':
+    if j:
         game_view.pause(screen)
         return ''
-    elif j == 'pause_stop' or j == None:
-    game_model.step()
-    if game_model.game_finish():
-        return 'menu'
-    game_view.draw(screen, round(clock.get_fps()))
+    else:
+        game_model.step()
+        game_view.draw(screen, round(clock.get_fps()))
+        if game_model.game_finish():
+            return 'menu'
 
