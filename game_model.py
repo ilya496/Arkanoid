@@ -20,23 +20,34 @@ def restart(game_mode):
     platform.centery = 700
 
     if game_mode == 'Easy':
-        speedx, speedy = angle(0, 10, 90)
+        #speedx, speedy = angle(0, 10, 90)
         for i in range(settings.SCREENX // 50):
-            blocks.append(pg.Rect(i * 50, 100, 49, 50))
+            b = {
+                'hp': 1,
+                'rect': pg.Rect(i * 50, 100, 49, 50)
+            }
+            blocks.append(b)
+
 
     if game_mode == 'Medium':
-        speedx = 11
-        speedy = 11
+        # speedx, speedy = angle(2, 13, 90)
         for j in range(2):
             for i in range(int(settings.SCREENX / 50)):
-                blocks.append(pg.Rect(i * 50, 100 + j * 51, 49, 50))
+                b = {
+                    'hp': 3,
+                    'rect': pg.Rect(i * 50, 100 + j * 51, 49, 50)
+                }
+                blocks.append(b)
 
     if game_mode == 'Hard':
-        speedx = 14
-        speedy = 14
+        # speedx, speedy = angle(4, 15, 90)
         for j in range(3):
             for i in range(int(settings.SCREENX / 50)):
-                blocks.append(pg.Rect(i * 50, 100 + j * 51, 49, 50))
+                b = {
+                    'hp': 3,
+                    'rect': pg.Rect(i * 50, 100 + j * 51, 49, 50)
+                }
+                blocks.append(b)
 
 
 def set_platform(x_position):
@@ -66,8 +77,27 @@ def angle(speedx, speedy, angle):
     return round(speedx), round(speedy)
 
 
-def step():
+def get_rects_from_blocks(blocks):
+    l = []
+    for i in blocks:
+        l.append(i['rect'])
+    return l
+
+
+def hit_block(blocks, index):
+    global score
+
+    blocks[index]['hp'] -= 1
+    if blocks[index]['hp'] <= 0:
+        score += 1
+        blocks.pop(index)
+
+
+def step(mouse_clicked):
     global speedy, speedx, score
+
+    if mouse_clicked == 2:
+        speedx, speedy = angle(0, 10, 90)
 
     circle.right += speedx
 
@@ -117,28 +147,25 @@ def step():
             speedy = -speedy
 
     # Отражении от верхних блоков
-    t1 = circle.collidelist(blocks)
+    blocks_rects = get_rects_from_blocks(blocks)
+    t1 = circle.collidelist(blocks_rects)
     if t1 != -1:
-        score += 1
-        if circle.centery < blocks[t1].top:
-            circle.bottom = blocks[t1].top
+        if circle.centery < blocks_rects[t1].top:
+            circle.bottom = blocks_rects[t1].top
             speedy = -speedy
-            blocks.pop(t1)
-            t1 = circle.collidelist(blocks)
+            hit_block(blocks, t1)
 
-        elif circle.centery > blocks[t1].bottom:
-            circle.top = blocks[t1].bottom
+        elif circle.centery > blocks_rects[t1].bottom:
+            circle.top = blocks_rects[t1].bottom
             speedy = -speedy
-            blocks.pop(t1)
-            t1 = circle.collidelist(blocks)
+            hit_block(blocks, t1)
 
-        elif circle.centerx < blocks[t1].left:
-            circle.right = blocks[t1].left
+        elif circle.centerx < blocks_rects[t1].left:
+            circle.right = blocks_rects[t1].left
             speedx = -speedx
-            blocks.pop(t1)
-            t1 = circle.collidelist(blocks)
+            hit_block(blocks, t1)
 
-        elif circle.centerx > blocks[t1].right:
-            circle.left = blocks[t1].right
+        elif circle.centerx > blocks_rects[t1].right:
+            circle.left = blocks_rects[t1].right
             speedx = -speedx
-            blocks.pop(t1)
+            hit_block(blocks, t1)

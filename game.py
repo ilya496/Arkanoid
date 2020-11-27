@@ -10,14 +10,14 @@ def restart(game_mode):
 def game(screen):
     global score, speedy, speedx
     clock.tick(100)
-    j = game_controller.process_events()
+    clicked = game_controller.process_events()
+    j = game_controller.pause()
 
     if j:
         game_view.pause(screen)
         return ''
     else:
-        game_model.step()
+        game_model.step(clicked)
         game_view.draw(screen, round(clock.get_fps()))
         if game_model.game_finish():
             return 'menu'
-

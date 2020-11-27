@@ -8,7 +8,9 @@ def draw(screen, fps):
     screen.fill([0, 0, 0])
 
     for j in game_model.blocks:
-        pg.draw.rect(screen, [201, 0, 17], j, 0)
+        k = f.render(str(j['hp']), True, [255, 255, 255])
+        pg.draw.rect(screen, [201, 0, 17], j['rect'], 0)
+        screen.blit(k, j['rect'].center)
 
     # Рисуем шарик
     pg.draw.circle(screen, [255, 221, 0], game_model.circle.center, 20)
