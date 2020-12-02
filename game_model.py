@@ -1,17 +1,41 @@
 import pygame as pg, settings, math
 
 score = 0
-circle = pg.Rect(settings.SCREENX / 2, settings.SCREENY / 2, 40, 40)
+circle = pg.Rect(settings.SCREENX / 2, settings.SCREENY / 2, 80, 80)
 platform = pg.Rect(0, 700, 300, 50)
 blocks = []
 
 speedx = 0
 speedy = 0
+ball_flight = False
+circle_radius = 25
 
+
+def cross_with_objectes(rect1, rect2):
+    global circle_radius
+
+    cross = rect1.colliderect(rect2)
+
+    if not cross:
+        return cross
+
+    mask1 = pg.mask.Mask(rect1.size, True)
+    img_rect2 = pg.Surface(rect2.size, pg.SRCALPHA)
+    img_rect2.fill([0,0,0,0])
+    pg.draw.circle(img_rect2, [255,255,255,255], [rect2.w//2,rect2.h//2], circle_radius)
+    mask2 = pg.mask.from_surface(img_rect2)
+
+    cross2 = mask1.overlap(mask2, [rect2.x-rect1.x, rect2.y-rect1.y] )
+    return cross2 is not None
+
+def fire():
+    global ball_flight
+    ball_flight = True
 
 def restart(game_mode):
-    global speedx, speedy, score
+    global speedx, speedy, score, ball_flight
 
+    ball_flight = False
     circle.centerx = settings.SCREENX / 2
     circle.centery = settings.SCREENY / 2
     blocks.clear()
@@ -20,7 +44,7 @@ def restart(game_mode):
     platform.centery = 700
 
     if game_mode == 'Easy':
-        #speedx, speedy = angle(0, 10, 90)
+        speedx, speedy = angle(0, 3, 90)
         for i in range(settings.SCREENX // 50):
             b = {
                 'hp': 1,
@@ -29,8 +53,8 @@ def restart(game_mode):
             blocks.append(b)
 
 
-    if game_mode == 'Medium':
-        # speedx, speedy = angle(2, 13, 90)
+    elif game_mode == 'Medium':
+        speedx, speedy = angle(2, 13, 90)
         for j in range(2):
             for i in range(int(settings.SCREENX / 50)):
                 b = {
@@ -39,8 +63,8 @@ def restart(game_mode):
                 }
                 blocks.append(b)
 
-    if game_mode == 'Hard':
-        # speedx, speedy = angle(4, 15, 90)
+    elif game_mode == 'Hard':
+        speedx, speedy = angle(4, 15, 90)
         for j in range(3):
             for i in range(int(settings.SCREENX / 50)):
                 b = {
@@ -93,12 +117,10 @@ def hit_block(blocks, index):
         blocks.pop(index)
 
 
-def step(mouse_clicked):
+def step():
     global speedy, speedx, score
-
-    if mouse_clicked == 2:
-        speedx, speedy = angle(0, 10, 90)
-
+    if not ball_flight:
+        return
     circle.right += speedx
 
     if circle.right >= settings.SCREENX:
@@ -108,20 +130,18 @@ def step(mouse_clicked):
         circle.left = 0
         speedx = -speedx
 
-    t = circle.colliderect(platform)
+    t = cross_with_objectes(platform, circle) #circle.colliderect(platform)
 
-    if t == 1:
+    if t:
         if circle.centerx < platform.left:
-            circle.right = platform.left
+            #circle.right = platform.left
             speedx = -speedx
-            t = circle.colliderect(platform)
 
         elif circle.centerx > platform.right:
-            circle.left = platform.right
+            #circle.left = platform.right
             speedx = -speedx
 
     circle.top += speedy
-    t = circle.colliderect(platform)
 
     if circle.top <= 0:
         circle.top = 0
@@ -130,11 +150,11 @@ def step(mouse_clicked):
         circle.bottom = settings.SCREENY
         speedy = -speedy
 
-    t = circle.colliderect(platform)
+    t = cross_with_objectes(platform, circle)
 
-    if t == 1:
+    if t:
         if circle.centery < platform.top:
-            circle.bottom = platform.top
+            #circle.bottom = platform.top
             sx, sy = angle(speedx, speedy, ballhit(platform.width, abs(platform.centerx - circle.centerx)))
             speedy = -sy
             if platform.centerx - circle.centerx < 0:
@@ -143,7 +163,7 @@ def step(mouse_clicked):
                 speedx = -sx
 
         elif circle.centery > platform.bottom:
-            circle.top = platform.bottom
+            #circle.top = platform.bottom
             speedy = -speedy
 
     # Отражении от верхних блоков

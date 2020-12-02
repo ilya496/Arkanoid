@@ -13,7 +13,8 @@ def draw(screen, fps):
         screen.blit(k, j['rect'].center)
 
     # Рисуем шарик
-    pg.draw.circle(screen, [255, 221, 0], game_model.circle.center, 20)
+    pg.draw.circle(screen, [255, 221, 0], game_model.circle.center, game_model.circle_radius)
+    pg.draw.rect(screen, [0,0,255], game_model.circle, 1)
     pg.draw.rect(screen, [0, 195, 4], game_model.platform)
     f1 = f.render('SCORE: ' + str(game_model.score), True, [255, 255, 255])
     fps = f.render('FPS: ' + str(fps), True, [255, 255, 255])
