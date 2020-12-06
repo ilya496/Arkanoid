@@ -1,10 +1,11 @@
-import pygame as pg, settings
+import pygame as pg
 
 clock = pg.time.Clock()
 text = pg.font.match_font('Arial')
 f = pg.font.Font(text, 24)
 f1 = pg.font.Font(text, 36)
 game_mode = 'Easy'
+
 
 def menu(screen):
     clock.tick(100)

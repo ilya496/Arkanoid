@@ -19,6 +19,3 @@ def process_events():
         if i.type == pg.KEYDOWN and i.key == pg.K_ESCAPE:
             pause_mode = not pause_mode
     return pause_mode
-
-
-

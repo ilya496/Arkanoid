@@ -2,16 +2,19 @@ import pygame as pg, game_view, game_model, game_controller
 
 clock = pg.time.Clock()
 
-def restart(game_mode):
-    game_model.restart(game_mode)
 
+def restart(game_mode):
+    game_model.restart_blocks(game_mode)
+    game_model.restart_player_settings()
+    game_model.restart_position()
+    game_model.restart_speed_and_angle(game_mode)
 
 def game(screen):
     global score, speedy, speedx
     clock.tick(100)
-    j = game_controller.process_events()
+    pause_mode = game_controller.process_events()
 
-    if j:
+    if pause_mode:
         game_view.pause(screen)
         return ''
     else:
