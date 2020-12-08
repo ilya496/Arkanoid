@@ -68,7 +68,11 @@ def restart_blocks(gm):
     global speedx, speedy, game_mode
 
     blocks.clear()
+
+    # TODO зачем это здесь. Это должно быть в общем самом главном game_model.restart(),
+    #  который перезапускает всю игру. На 124 строке.
     game_mode = gm
+
     easy1 = True
     easy2 = False
 
@@ -113,6 +117,8 @@ def restart_player_settings():
 
 
 def restart(gm):
+    #TODO эта функция нигде не используется.
+    # И в ней дублируются все действия, которые уже есть в других, более мелких функциях.
     global speedx, speedy, score, ball_flight, player_hp, game_mode
 
     game_mode = gm
