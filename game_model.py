@@ -1,4 +1,4 @@
-import pygame as pg, settings, math
+import pygame as pg, settings, math, block
 
 score = 0
 circle_radius = 25
@@ -11,6 +11,7 @@ speedx = 0
 speedy = 0
 ball_flight = False
 player_hp = 3
+level = 'first'
 
 
 def cross_with_objectlist(circle, list_of_objects):
@@ -48,7 +49,7 @@ def restart_position():
 
     ball_flight = False
     platform.centerx = circle.centerx
-    platform.centery = 700
+    platform.centery = 850
     circle.centerx = settings.SCREENX / 2
     circle.centery = settings.SCREENY / 2
 
@@ -56,110 +57,99 @@ def restart_position():
 def restart_speed_and_angle(gm):
     global speedx, speedy
 
-    if gm == 'Easy':
+    if gm == 'easy':
         speedx, speedy = angle(0, 10, 90)
-    elif gm == 'Medium':
+    elif gm == 'medium':
         speedx, speedy = angle(2, 13, 90)
-    elif gm == 'Hard':
+    elif gm == 'hard':
         speedx, speedy = angle(4, 15, 90)
 
 
 def restart_blocks(gm):
-    global speedx, speedy, game_mode
+    global speedx, speedy, game_mode, level
 
     blocks.clear()
 
-    # TODO зачем это здесь. Это должно быть в общем самом главном game_model.restart(),
-    #  который перезапускает всю игру. На 124 строке.
-    game_mode = gm
+    if level == 'first':
 
-    easy1 = True
-    easy2 = False
-
-    if easy1 and gm == 'Easy':
-        # speedx, speedy = angle(0, 10, 90)
-        for i in range(settings.SCREENX // 50):
-            b = {
-                'hp': 1,
-                'rect': pg.Rect(i * 50, 100, 49, 50)
-            }
-            blocks.append(b)
-
-    elif easy2 and gm == 'Easy':
-        pass
-
-    elif gm == 'Medium':
-        # speedx, speedy = angle(2, 13, 90)
-        for j in range(2):
-            for i in range(int(settings.SCREENX / 50)):
-                b = {
-                    'hp': 3,
-                    'rect': pg.Rect(i * 50, 100 + j * 51, 49, 50)
-                }
+        if gm == 'easy':
+            for i in range(settings.SCREENX // 50):
+                # b = {
+                #     'hp': 1,
+                #     'rect': pg.Rect(i * 50, 70, 49, 50)
+                # }
+                if i % 2 == 0:
+                    b = block.SuperBlock(i * 50, 70, 49, 50, 1)
+                else:
+                    b = block.Block(i * 50, 70, 49, 50, 1)
                 blocks.append(b)
 
-    elif gm == 'Hard':
-        # speedx, speedy = angle(4, 15, 90)
-        for j in range(3):
-            for i in range(int(settings.SCREENX / 50)):
-                b = {
-                    'hp': 3,
-                    'rect': pg.Rect(i * 50, 100 + j * 51, 49, 50)
-                }
-                blocks.append(b)
+        elif gm == 'medium':
+            for j in range(2):
+                for i in range(int(settings.SCREENX / 50)):
+                    b = {
+                        'hp': 2,
+                        'rect': pg.Rect(i * 50, 70 + j * 51, 49, 50)
+                    }
+                    blocks.append(b)
+
+        elif gm == 'hard':
+            for j in range(3):
+                for i in range(int(settings.SCREENX / 50)):
+                    b = {
+                        'hp': 3,
+                        'rect': pg.Rect(i * 50, 70 + j * 51, 49, 50)
+                    }
+                    blocks.append(b)
+
+    elif level == 'second':
+
+        if gm == 'easy':
+            for j in range(5):
+                for i in range(settings.SCREENX // 100):
+                    a = (j % 2) * 50  # bool(j & 1) * 50
+                    b = {
+                        'hp': 1,
+                        'rect': pg.Rect(i * 100 + a, 70 + j * 50, 49, 50)
+                    }
+                    blocks.append(b)
+
+        elif gm == 'medium':
+            for j in range(2):
+                for i in range(int(settings.SCREENX / 50)):
+                    b = {
+                        'hp': 2,
+                        'rect': pg.Rect(i * 50, 70 + j * 51, 49, 50)
+                    }
+                    blocks.append(b)
+
+        elif gm == 'hard':
+            for j in range(3):
+                for i in range(int(settings.SCREENX / 50)):
+                    b = {
+                        'hp': 3,
+                        'rect': pg.Rect(i * 50, 70 + j * 51, 49, 50)
+                    }
+                    blocks.append(b)
 
 
 def restart_player_settings():
-    global player_hp, score
+    global player_hp, score, level
 
+    level = 'first'
     player_hp = 3
     score = 0
 
 
-def restart(gm):
-    #TODO эта функция нигде не используется.
-    # И в ней дублируются все действия, которые уже есть в других, более мелких функциях.
-    global speedx, speedy, score, ball_flight, player_hp, game_mode
+def restart_all(gm):
+    global game_mode
 
     game_mode = gm
-    player_hp = 3
-    ball_flight = False
-    circle.centerx = settings.SCREENX / 2
-    circle.centery = settings.SCREENY / 2
-    blocks.clear()
-    score = 0
-    platform.centerx = 600
-    platform.centery = 700
 
-    if gm == 'Easy':
-        speedx, speedy = angle(0, 10, 90)
-        for i in range(settings.SCREENX // 50):
-            b = {
-                'hp': 1,
-                'rect': pg.Rect(i * 50, 100, 49, 50)
-            }
-            blocks.append(b)
-
-
-    elif gm == 'Medium':
-        speedx, speedy = angle(2, 13, 90)
-        for j in range(2):
-            for i in range(int(settings.SCREENX / 50)):
-                b = {
-                    'hp': 3,
-                    'rect': pg.Rect(i * 50, 100 + j * 51, 49, 50)
-                }
-                blocks.append(b)
-
-    elif gm == 'Hard':
-        speedx, speedy = angle(4, 15, 90)
-        for j in range(3):
-            for i in range(int(settings.SCREENX / 50)):
-                b = {
-                    'hp': 3,
-                    'rect': pg.Rect(i * 50, 100 + j * 51, 49, 50)
-                }
-                blocks.append(b)
+    restart_player_settings()
+    restart_position()
+    restart_blocks(game_mode)
+    restart_speed_and_angle(game_mode)
 
 
 def set_platform(x_position):
@@ -167,16 +157,26 @@ def set_platform(x_position):
 
 
 def game_finish():
-    global player_hp
+    global player_hp, level
 
     if len(blocks) == 0:
-        return True
-    elif circle.bottom >= settings.SCREENY:
-        restart_position()
-        restart_speed_and_angle(game_mode)
-        player_hp -= 1
-        if player_hp <= 0:
+        if level == 'first':
+            level = 'second'
+            restart_blocks(game_mode)
+            restart_speed_and_angle(game_mode)
+            restart_position()
+
+        elif level == 'second':
             return True
+
+    if circle.bottom >= settings.SCREENY:
+        restart_speed_and_angle(game_mode)
+        restart_position()
+        player_hp -= 1
+
+    if player_hp <= 0:
+        return True
+
     return False
 
 
@@ -198,15 +198,15 @@ def angle(speedx, speedy, angle):
 def get_rects_from_blocks(blocks):
     l = []
     for i in blocks:
-        l.append(i['rect'])
+        l.append(i.rect)
     return l
 
 
 def hit_block(blocks, index):
     global score
 
-    blocks[index]['hp'] -= 1
-    if blocks[index]['hp'] <= 0:
+    blocks[index].hp -= 1
+    if blocks[index].hp <= 0:
         score += 1
         blocks.pop(index)
 
