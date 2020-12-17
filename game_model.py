@@ -1,7 +1,7 @@
 import pygame as pg, settings, math, block, json
 
 score = 0
-circle_radius = 25
+circle_radius = 8
 circle = pg.Rect(settings.SCREENX / 2, settings.SCREENY / 2, circle_radius * 2, circle_radius * 2)
 platform = pg.Rect(0, 700, 300, 50)
 blocks = []
@@ -81,6 +81,7 @@ def restart_blocks(gm):
 
         if gm == 'easy':
             list_of_dicts = reading_map('map.json')
+            print(type(list_of_dicts))
             for i in range(len(list_of_dicts)):
                 b = block.Block(list_of_dicts[i]['left'], list_of_dicts[i]['top'], list_of_dicts[i]['width'], list_of_dicts[i]['height'], 1)
                 blocks.append(b)
@@ -235,11 +236,11 @@ def step():
     t = cross_with_objectes(platform, circle)
 
     if t:
-        if circle.centerx < platform.left:
+        if circle.centerx <= platform.left:
             circle.right = platform.left
             speedx = -speedx
 
-        elif circle.centerx > platform.right:
+        elif circle.centerx >= platform.right:
             circle.left = platform.right
             speedx = -speedx
 
@@ -255,7 +256,7 @@ def step():
     t = cross_with_objectes(platform, circle)
 
     if t:
-        if circle.centery < platform.top:
+        if circle.centery <= platform.top:
             circle.bottom = platform.top
             sx, sy = angle(speedx, speedy, ballhit(platform.width, abs(platform.centerx - circle.centerx)))
             speedy = -sy
@@ -264,7 +265,7 @@ def step():
             else:
                 speedx = -sx
 
-        elif circle.centery > platform.bottom:
+        elif circle.centery >= platform.bottom:
             circle.top = platform.bottom
             speedy = -speedy
 
@@ -272,22 +273,22 @@ def step():
     blocks_rects = get_rects_from_blocks(blocks)
     t1 = cross_with_objectlist(circle, blocks_rects)  # circle.collidelist(blocks_rects)
     if t1 != -1:
-        if circle.centery < blocks_rects[t1].top:
+        if circle.centery <= blocks_rects[t1].top:
             circle.bottom = blocks_rects[t1].top
             speedy = -speedy
             hit_block(blocks, t1)
 
-        elif circle.centery > blocks_rects[t1].bottom:
+        elif circle.centery >= blocks_rects[t1].bottom:
             circle.top = blocks_rects[t1].bottom
             speedy = -speedy
             hit_block(blocks, t1)
 
-        elif circle.centerx < blocks_rects[t1].left:
+        elif circle.centerx <= blocks_rects[t1].left:
             circle.right = blocks_rects[t1].left
             speedx = -speedx
             hit_block(blocks, t1)
 
-        elif circle.centerx > blocks_rects[t1].right:
+        elif circle.centerx >= blocks_rects[t1].right:
             circle.left = blocks_rects[t1].right
             speedx = -speedx
             hit_block(blocks, t1)
