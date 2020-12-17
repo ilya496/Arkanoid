@@ -1,4 +1,4 @@
-import pygame as pg, settings, math, block
+import pygame as pg, settings, math, block, json
 
 score = 0
 circle_radius = 25
@@ -65,6 +65,13 @@ def restart_speed_and_angle(gm):
         speedx, speedy = angle(4, 15, 90)
 
 
+def reading_map(json_file):
+    data = []
+    data1 = []
+    file = open(json_file, 'r')
+    data.append(json.load(file))
+    return data[0]
+
 def restart_blocks(gm):
     global speedx, speedy, game_mode, level
 
@@ -73,16 +80,17 @@ def restart_blocks(gm):
     if level == 'first':
 
         if gm == 'easy':
-            for i in range(settings.SCREENX // 50):
-                # b = {
-                #     'hp': 1,
-                #     'rect': pg.Rect(i * 50, 70, 49, 50)
-                # }
-                if i % 2 == 0:
-                    b = block.SuperBlock(i * 50, 70, 49, 50, 1)
-                else:
-                    b = block.Block(i * 50, 70, 49, 50, 1)
+            list_of_dicts = reading_map('map.json')
+            for i in range(len(list_of_dicts)):
+                b = block.Block(list_of_dicts[i]['left'], list_of_dicts[i]['top'], list_of_dicts[i]['width'], list_of_dicts[i]['height'], 1)
                 blocks.append(b)
+            # for i in range(settings.SCREENX // 50):
+            #     # b = {
+            #     #     'hp': 1,
+            #     #     'rect': pg.Rect(i * 50, 70, 49, 50)
+            #     # }
+            #     b = block.Block(i * 50, 70, 49, 50, 1)
+            #     blocks.append(b)
 
         elif gm == 'medium':
             for j in range(2):

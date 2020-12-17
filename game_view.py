@@ -10,8 +10,7 @@ def draw(screen, fps):
 
     # Надпись ХП у верхних блоков и сами блоки
     for j in game_model.blocks:
-        j.draw(screen, [255, 0, 0])
-        j.draw_hp(screen)
+        j.draw(screen)
 
     # Отрисовка шарика
     pg.draw.circle(screen, [255, 221, 0], game_model.circle.center, game_model.circle_radius)
