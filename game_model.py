@@ -1,7 +1,7 @@
-import pygame as pg, settings, math, block, json
+import pygame as pg, settings, math, block, json, os
 
 score = 0
-circle_radius = 8
+circle_radius = 25
 circle = pg.Rect(settings.SCREENX / 2, settings.SCREENY / 2, circle_radius * 2, circle_radius * 2)
 platform = pg.Rect(0, 700, 300, 50)
 blocks = []
@@ -11,7 +11,7 @@ speedx = 0
 speedy = 0
 ball_flight = False
 player_hp = 3
-level = 'first'
+level = 1
 
 
 def cross_with_objectlist(circle, list_of_objects):
@@ -67,85 +67,51 @@ def restart_speed_and_angle(gm):
 
 def reading_map(json_file):
     data = []
-    data1 = []
     file = open(json_file, 'r')
     data.append(json.load(file))
     return data[0]
+
 
 def restart_blocks(gm):
     global speedx, speedy, game_mode, level
 
     blocks.clear()
 
-    if level == 'first':
+    if gm == 'easy':
+        maps_directory = 'easy_mode_maps'
+        postfix = 'e'
 
-        if gm == 'easy':
-            list_of_dicts = reading_map('map.json')
-            print(type(list_of_dicts))
-            for i in range(len(list_of_dicts)):
-                b = block.Block(list_of_dicts[i]['left'], list_of_dicts[i]['top'], list_of_dicts[i]['width'], list_of_dicts[i]['height'], 1)
-                blocks.append(b)
-            # for i in range(settings.SCREENX // 50):
-            #     # b = {
-            #     #     'hp': 1,
-            #     #     'rect': pg.Rect(i * 50, 70, 49, 50)
-            #     # }
-            #     b = block.Block(i * 50, 70, 49, 50, 1)
-            #     blocks.append(b)
+    elif gm == 'medium':
+        maps_directory = 'medium_mode_maps'
+        postfix = 'm'
 
-        elif gm == 'medium':
-            for j in range(2):
-                for i in range(int(settings.SCREENX / 50)):
-                    b = {
-                        'hp': 2,
-                        'rect': pg.Rect(i * 50, 70 + j * 51, 49, 50)
-                    }
-                    blocks.append(b)
+    elif gm == 'hard':
+        maps_directory = 'hard_mode_maps'
+        postfix = 'h'
 
-        elif gm == 'hard':
-            for j in range(3):
-                for i in range(int(settings.SCREENX / 50)):
-                    b = {
-                        'hp': 3,
-                        'rect': pg.Rect(i * 50, 70 + j * 51, 49, 50)
-                    }
-                    blocks.append(b)
+    fullname = os.path.join(os.getcwd(), maps_directory)
+    names = os.listdir(fullname)
+    for name in names:
+        fullname_file = os.path.join(fullname, name)
+        print(fullname)
+        if os.path.isfile(fullname_file):
+            filename, file_extension = os.path.splitext(name)
+            if file_extension == '.json' and filename == str(level) + postfix:
+                list_of_dicts = reading_map(fullname_file)
+                break
+    else:
+        return False
 
-    elif level == 'second':
+    for i in list_of_dicts:
+        b = block.Block(i)
+        blocks.append(b)
 
-        if gm == 'easy':
-            for j in range(5):
-                for i in range(settings.SCREENX // 100):
-                    a = (j % 2) * 50  # bool(j & 1) * 50
-                    b = {
-                        'hp': 1,
-                        'rect': pg.Rect(i * 100 + a, 70 + j * 50, 49, 50)
-                    }
-                    blocks.append(b)
-
-        elif gm == 'medium':
-            for j in range(2):
-                for i in range(int(settings.SCREENX / 50)):
-                    b = {
-                        'hp': 2,
-                        'rect': pg.Rect(i * 50, 70 + j * 51, 49, 50)
-                    }
-                    blocks.append(b)
-
-        elif gm == 'hard':
-            for j in range(3):
-                for i in range(int(settings.SCREENX / 50)):
-                    b = {
-                        'hp': 3,
-                        'rect': pg.Rect(i * 50, 70 + j * 51, 49, 50)
-                    }
-                    blocks.append(b)
-
+    return True
 
 def restart_player_settings():
     global player_hp, score, level
 
-    level = 'first'
+    level = 1
     player_hp = 3
     score = 0
 
@@ -169,13 +135,11 @@ def game_finish():
     global player_hp, level
 
     if len(blocks) == 0:
-        if level == 'first':
-            level = 'second'
-            restart_blocks(game_mode)
-            restart_speed_and_angle(game_mode)
-            restart_position()
+        level += 1
+        restart_speed_and_angle(game_mode)
+        restart_position()
 
-        elif level == 'second':
+        if not restart_blocks(game_mode):
             return True
 
     if circle.bottom >= settings.SCREENY:
